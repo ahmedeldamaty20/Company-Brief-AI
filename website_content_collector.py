@@ -1,4 +1,6 @@
 import json
+from urllib.parse import urljoin
+import requests
 from openai import OpenAI
 from scraper import fetch_website_links, fetch_website_contents
 
@@ -51,6 +53,13 @@ def fetch_page_and_all_relevant_links(url, model, client:OpenAI):
     relevant_links = select_relevant_links(url, model, client)
     result = f"## Landing Page:\n\n{contents}\n## Relevant Links:\n"
     for link in relevant_links['links']:
+        link_url = urljoin(url, link["url"])
+        print(f"Fetching content for {link_url}...")
+        try:
+            page_content = fetch_website_contents(link_url)
+        except requests.RequestException as e:
+            print(f"Skipping {link_url}: {e}")
+            continue
         result += f"\n\n### Link: {link['type']}\n"
-        result += fetch_website_contents(link["url"])
+        result += page_content
     return result
