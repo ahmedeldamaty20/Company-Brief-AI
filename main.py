@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
@@ -24,6 +25,9 @@ and creates a short brochure about the company for prospective customers, invest
 Respond in markdown without code blocks.
 Include details of company culture, customers and careers/jobs if you have the information.
 """
+
+def slugify(name):
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
 
 def build_brochure_user_prompt(company_name, site_content):
     header = (
@@ -78,5 +82,5 @@ if __name__ == "__main__":
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    with open(f"{OUTPUT_DIR}/{name.lower()}_brochure.md", "w", encoding="utf-8") as f:
+    with open(OUTPUT_DIR / f"{slugify(name)}_brochure.md", "w", encoding="utf-8") as f:
         f.write(brochure) # type: ignore
